@@ -1,5 +1,6 @@
 import Cart, { ICart, ICartItem } from '../models/Cart';
 import Product from '../models/Product';
+import logger from '../utils/logger';
 
 class CartService {
     async addToCart(userId: string, productId: string, quantity: number): Promise<ICart> {
@@ -11,6 +12,7 @@ class CartService {
 
             let cart = await Cart.findOne({ cartId: userId });
             if (!cart) {
+                // console.log(`Cart found for userId: ${userId}`);
                 cart = new Cart({ cartId: userId, items: [] });
             }
 
@@ -20,23 +22,31 @@ class CartService {
             } else {
                 cart.items.push({ productId, quantity });
             }
-
+            
             await cart.save();
             return cart;
         } catch (error) {
             throw new Error(`Unable to add to cart: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
-
+    
     async removeFromCart(userId: string, productId: string): Promise<ICart> {
         try {
             const cart = await Cart.findOne({ cartId: userId });
             if (!cart) {
                 throw new Error('Cart not found');
             }
-
+    
+            const originalLength = cart.items.length;
             cart.items = cart.items.filter(item => item.productId !== productId);
-            await cart.save();
+    
+            if (cart.items.length === originalLength) {
+                logger.info(`Product ID ${productId} not found in cart`);
+            } else {
+                logger.info(`Product ID ${productId} removed from cart`);
+            }
+    
+            await cart.save();        
             return cart;
         } catch (error) {
             throw new Error(`Unable to remove from cart: ${error instanceof Error ? error.message : 'Unknown error'}`);

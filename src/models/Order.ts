@@ -8,7 +8,7 @@ interface IOrderItem {
 
 interface IOrder extends Document {
     orderId: string;
-    userId: string;  // Add userId to link the order to a user
+    userId: string;
     items: IOrderItem[];
     totalPrice: number;
     createdAt: Date;
@@ -22,7 +22,7 @@ const OrderItemSchema = new Schema<IOrderItem>({
 
 const OrderSchema = new Schema<IOrder>({
     orderId: { type: String, required: true, unique: true },
-    userId: { type: String, required: true },  // Add userId field
+    userId: { type: String, required: true },  
     items: [OrderItemSchema],
     totalPrice: { type: Number, required: true },
     createdAt: { type: Date, default: Date.now }

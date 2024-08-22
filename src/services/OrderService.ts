@@ -3,7 +3,7 @@ import Cart from '../models/Cart';
 import Product from '../models/Product';
 
 class OrderService {
-    async createOrder(userId: string, cartId: string): Promise<IOrder> {
+    async createOrder(cartId: string): Promise<IOrder> {
         try {
             const cart = await Cart.findOne({ cartId });
             if (!cart) {
@@ -38,7 +38,7 @@ class OrderService {
             const orderId = `ORD-${Date.now()}`;
             const order = new Order({
                 orderId,
-                userId,  // Assign userId to the order
+                userId : cartId,  
                 items: orderItems,
                 totalPrice
             });
@@ -48,7 +48,7 @@ class OrderService {
 
             return order;
         } catch (error) {
-            throw new Error(`Unable to create order: ${error.message}`);
+            throw new Error(`Unable to create order: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 }

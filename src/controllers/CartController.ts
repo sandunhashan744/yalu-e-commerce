@@ -7,6 +7,7 @@ class CartController {
         try {
             const { userId } = req.params;
             const { productId, quantity } = req.body;
+
             const cart = await CartService.addToCart(userId, productId, quantity);
             res.status(200).json({ cart });
             logger.info(`Product added to cart: userId=${userId}, productId=${productId}, quantity=${quantity}`);
